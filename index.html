@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analysis for Career Switchers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .progress-overview {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .weeks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .week-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .week-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .week-card.completed {
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .week-card.in-progress {
+            border-left: 5px solid #FF9800;
+        }
+        
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .week-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .week-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-not-started {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .status-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .week-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .learning-objectives {
+            margin-bottom: 15px;
+        }
+        
+        .objectives-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .objectives-list {
+            list-style: none;
+        }
+        
+        .objectives-list li {
+            padding: 3px 0;
+            color: #555;
+            font-size: 0.85rem;
+        }
+        
+        .objectives-list li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .time-commitment {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #495057;
+            text-align: center;
+        }
+        
+        .expanded-content {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .activities-section, .resources-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .activity-item, .resource-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .activity-title, .resource-title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .activity-description, .resource-description {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .toggle-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.3s ease;
+        }
+        
+        .toggle-btn:hover {
+            background: #5a67d8;
+        }
+        
+        .completion-tracker {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .tracker-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .milestone {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .milestone-checkbox {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        
+        .milestone-text {
+            flex: 1;
+            color: #333;
+        }
+        
+        .milestone.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .weeks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Data Analysis Mastery</h1>
+            <p>A Complete Career-Switcher's Guide to Data Analytics</p>
+        </div>
+        
+        <div class="progress-overview">
+            <h3>Overall Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="overallProgress" style="width: 0%"></div>
+            </div>
+            <p id="progressText">0% Complete • 0 of 8 weeks finished</p>
+        </div>
+        
+        <div class="weeks-grid" id="weeksContainer">
+            <!-- Week cards will be generated by JavaScript -->
+        </div>
+        
+        <div class="completion-tracker">
+            <h3 class="tracker-title">🎯 Career Readiness Milestones</h3>
+            <div id="milestonesContainer">
+                <!-- Milestones will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const curriculum = {
+            weeks: [
+                {
+                    title: "Week 1: Data Fundamentals",
+                    description: "Build your foundation with core concepts, data types, and the analytics mindset.",
+                    timeCommitment: "4-6 hours",
+                    objectives: [
+                        "Understand different types of data and their applications",
+                        "Learn the data analysis process from question to insight",
+                        "Identify common data sources in business contexts",
+                        "Practice asking the right analytical questions"
+                    ],
+                    activities: [
+                        {
+                            title: "Data Detective Exercise",
+                            description: "Analyze a simple dataset from your current industry to identify patterns and trends"
+                        },
+                        {
+                            title: "Question Formulation Workshop",
+                            description: "Practice turning business problems into answerable data questions"
+                        },
+                        {
+                            title: "Data Source Mapping",
+                            description: "Create a map of data sources available in your current or target industry"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Reading: 'Data Types and Their Business Applications'",
+                            description: "Comprehensive guide to numerical, categorical, and time-series data"
+                        },
+                        {
+                            title: "Video Series: 'The Analytics Mindset'",
+                            description: "4-part series on thinking analytically about business problems"
+                        }
+                    ]
+                },
+                {
+                    title: "Week 2: Excel Mastery",
+                    description: "Master Excel as your primary analysis tool with advanced functions and visualization.",
+                    timeCommitment: "5-7 hours",
+                    objectives: [
+                        "Master pivot tables, VLOOKUP, and advanced formulas",
+                        "Create professional charts and dashboards",
+                        "Learn data cleaning techniques in Excel",
+                        "Build your first analytical report"
+                    ],
+                    activities: [
+                        {
+                            title: "Sales Data Analysis Project",
+                            description: "Complete end-to-end analysis of sample sales data with visualizations"
+                        },
+                        {
+                            title: "Dashboard Creation Challenge",
+                            description: "Build an executive dashboard using Excel's advanced features"
+                        },
+                        {
+                            title: "Data Cleaning Bootcamp",
+                            description: "Practice cleaning messy datasets using Excel functions"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Excel Template Library",
+                            description: "Download 15+ professional analysis templates"
+                        },
+                        {
+                            title: "Video Tutorial: 'Excel for Analysts'",
+                            description: "Step-by-step guide to advanced Excel techniques"
+                        }
+                    ]
+                },
+                {
+                    title: "Week 3: SQL Fundamentals",
+                    description: "Learn to query databases and extract insights from large datasets.",
+                    timeCommitment: "6-8 hours",
+                    objectives: [
+                        "Write basic SELECT, WHERE, and GROUP BY queries",
+                        "Understand database structure and relationships",
+                        "Perform data aggregation and filtering",
+                        "Connect SQL queries to business questions"
+                    ],
+                    activities: [
+                        {
+                            title: "SQL Query Challenges",
+                            description: "50 progressively difficult SQL problems with real business scenarios"
+                        },
+                        {
+                            title: "Database Design Workshop",
+                            description: "Design a simple database schema for a business case"
+                        },
+                        {
+                            title: "Data Extraction Project",
+                            description: "Extract and analyze data from a sample e-commerce database"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Interactive SQL Playground",
+                            description: "Practice SQL queries with immediate feedback"
+                        },
+                        {
+                            title: "SQL Cheat Sheet",
+                            description: "Downloadable reference guide for common SQL patterns"
+                        }
+                    ]
+                },
+                {
+                    title: "Week 4: Data Visualization",
+                    description: "Master the art of telling stories with data through effective visualizations.",
+                    timeCommitment: "5-7 hours",
+                    objectives: [
+                        "Choose the right chart type for your data",
+                        "Apply design principles for clear communication",
+                        "Create interactive dashboards",
+                        "Present data insights to stakeholders"
+                    ],
+                    activities: [
+                        {
+                            title: "Chart Type Decision Tree",
+                            description: "Build a personal reference guide for choosing visualizations"
+                        },
+                        {
+                            title: "Bad Viz Makeover",
+                            description: "Redesign poorly constructed charts using best practices"
+                        },
+                        {
+                            title: "Stakeholder Presentation",
+                            description: "Create and present a data story to mock stakeholders"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Tableau Public Account Setup",
+                            description: "Free account creation and basic tutorial completion"
+                        },
+                        {
+                            title: "Color Theory for Data",
+                            description: "Guide to choosing effective color palettes"
+                        }
+                    ]
+                },
+                {
+                    title: "Week 5: Statistical Thinking",
+                    description: "Build statistical intuition for making data-driven decisions with confidence.",
+                    timeCommitment: "6-8 hours",
+                    objectives: [
+                        "Understand descriptive statistics and their applications",
+                        "Learn about correlation vs. causation",
+                        "Apply hypothesis testing to business questions",
+                        "Interpret statistical significance in context"
+                    ],
+                    activities: [
+                        {
+                            title: "A/B Test Design",
+                            description: "Design and analyze a simple A/B test for a business scenario"
+                        },
+                        {
+                            title: "Statistical Storytelling",
+                            description: "Explain statistical concepts to non-technical audience"
+                        },
+                        {
+                            title: "Correlation Investigation",
+                            description: "Find and explain spurious correlations in real datasets"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Statistics Without Fear",
+                            description: "Non-intimidating introduction to business statistics"
+                        },
+                        {
+                            title: "Statistical Thinking Toolkit",
+                            description: "Templates for common statistical analyses"
+                        }
+                    ]
+                },
+                {
+                    title: "Week 6: Python for Analysis",
+                    description: "Expand your toolkit with Python for more powerful data manipulation and analysis.",
+                    timeCommitment: "7-9 hours",
+                    objectives: [
+                        "Learn pandas for data manipulation",
+                        "Create visualizations with matplotlib/seaborn",
+                        "Perform statistical analysis with scipy",
+                        "Build reproducible analysis notebooks"
+                    ],
+                    activities: [
+                        {
+                            title: "Data Cleaning in Python",
+                            description: "Clean and prepare messy datasets using pandas"
+                        },
+                        {
+                            title: "Exploratory Data Analysis",
+                            description: "Complete EDA on a real-world dataset with insights"
+                        },
+                        {
+                            title: "Python vs Excel Comparison",
+                            description: "Recreate your Week 2 Excel analysis in Python"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Jupyter Notebook Setup Guide",
+                            description: "Complete environment setup for data analysis"
+                        },
+                        {
+                            title: "Python Data Analysis Cookbook",
+                            description: "Common data analysis recipes and code snippets"
+                        }
+                    ]
+                },
+                {
+                    title: "Week 7: Business Intelligence",
+                    description: "Learn to build professional dashboards and automated reporting systems.",
+                    timeCommitment: "6-8 hours",
+                    objectives: [
+                        "Design KPI frameworks for different business functions",
+                        "Build automated dashboards and reports",
+                        "Understand data warehousing concepts",
+                        "Create business intelligence solutions"
+                    ],
+                    activities: [
+                        {
+                            title: "KPI Dashboard Build",
+                            description: "Create a comprehensive business dashboard with multiple data sources"
+                        },
+                        {
+                            title: "Automated Reporting System",
+                            description: "Set up automatic data refresh and report generation"
+                        },
+                        {
+                            title: "Business Case Analysis",
+                            description: "Analyze a complex business problem using multiple analytical approaches"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Power BI/Tableau Tutorial Series",
+                            description: "Advanced dashboard creation techniques"
+                        },
+                        {
+                            title: "KPI Library by Industry",
+                            description: "Comprehensive list of KPIs for different business sectors"
+                        }
+                    ]
+                },
+                {
+                    title: "Week 8: Portfolio & Career",
+                    description: "Build your professional portfolio and prepare for your data analyst career transition.",
+                    timeCommitment: "8-10 hours",
+                    objectives: [
+                        "Complete 2-3 portfolio projects showcasing different skills",
+                        "Optimize LinkedIn and resume for data analyst roles",
+                        "Practice technical interviews and case studies",
+                        "Develop your personal brand as a data professional"
+                    ],
+                    activities: [
+                        {
+                            title: "Portfolio Project Completion",
+                            description: "Finish 3 comprehensive projects for your portfolio"
+                        },
+                        {
+                            title: "Mock Interview Sessions",
+                            description: "Practice technical and behavioral interviews"
+                        },
+                        {
+                            title: "Industry Network Building",
+                            description: "Connect with 10+ data professionals on LinkedIn"
+                        }
+                    ],
+                    resources: [
+                        {
+                            title: "Data Analyst Resume Template",
+                            description: "ATS-optimized resume template with examples"
+                        },
+                        {
+                            title: "Technical Interview Prep Kit",
+                            description: "Common data analyst interview questions and solutions"
+                        }
+                    ]
+                }
+            ],
+            milestones: [
+                "Complete first data analysis project in Excel",
+                "Write 10 different SQL queries successfully",
+                "Create your first professional dashboard",
+                "Explain a statistical concept to a non-technical person",
+                "Complete an end-to-end analysis in Python",
+                "Build an automated reporting system",
+                "Publish your first portfolio project online",
+                "Land your first data analyst interview"
+            ]
+        };
+
+        let completedWeeks = JSON.parse(localStorage.getItem('completedWeeks') || '[]');
+        let completedMilestones = JSON.parse(localStorage.getItem('completedMilestones') || '[]');
+
+        function updateProgress() {
+            const totalWeeks = curriculum.weeks.length;
+            const completed = completedWeeks.length;
+            const percentage = Math.round((completed / totalWeeks) * 100);
+            
+            document.getElementById('overallProgress').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = 
+                `${percentage}% Complete • ${completed} of ${totalWeeks} weeks finished`;
+        }
+
+        function getWeekStatus(index) {
+            if (completedWeeks.includes(index)) return 'completed';
+            if (index === 0 || completedWeeks.includes(index - 1)) return 'in-progress';
+            return 'not-started';
+        }
+
+        function toggleWeekCompletion(index) {
+            if (completedWeeks.includes(index)) {
+                completedWeeks = completedWeeks.filter(w => w !== index);
+            } else {
+                completedWeeks.push(index);
+            }
+            localStorage.setItem('completedWeeks', JSON.stringify(completedWeeks));
+            renderWeeks();
+            updateProgress();
+        }
+
+        function toggleWeekDetails(index) {
+            const content = document.getElementById(`week-${index}-details`);
+            const isHidden = content.style.display === 'none' || !content.style.display;
+            content.style.display = isHidden ? 'block' : 'none';
+        }
+
+        function renderWeeks() {
+            const container = document.getElementById('weeksContainer');
+            container.innerHTML = '';
+
+            curriculum.weeks.forEach((week, index) => {
+                const status = getWeekStatus(index);
+                const statusText = status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                const weekCard = document.createElement('div');
+                weekCard.className = `week-card ${status}`;
+                
+                weekCard.innerHTML = `
+                    <div class="week-header">
+                        <div class="week-title">${week.title}</div>
+                        <div class="week-status status-${status}">${statusText}</div>
+                    </div>
+                    <div class="week-description">${week.description}</div>
+                    <div class="learning-objectives">
+                        <div class="objectives-title">Learning Objectives:</div>
+                        <ul class="objectives-list">
+                            ${week.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="time-commitment">⏱️ Time Commitment: ${week.timeCommitment}</div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="toggle-btn" onclick="toggleWeekDetails(${index})">View Details</button>
+                        <button class="toggle-btn" onclick="toggleWeekCompletion(${index})">
+                            ${completedWeeks.includes(index) ? 'Mark Incomplete' : 'Mark Complete'}
+                        </button>
+                    </div>
+                    <div id="week-${index}-details" class="expanded-content">
+                        <div class="activities-section">
+                            <div class="section-title">🎯 Hands-on Activities</div>
+                            ${week.activities.map(activity => `
+                                <div class="activity-item">
+                                    <div class="activity-title">${activity.title}</div>
+                                    <div class="activity-description">${activity.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="resources-section">
+                            <div class="section-title">📚 Resources & Materials</div>
+                            ${week.resources.map(resource => `
+                                <div class="resource-item">
+                                    <div class="resource-title">${resource.title}</div>
+                                    <div class="resource-description">${resource.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(weekCard);
+            });
+        }
+
+        function toggleMilestone(index) {
+            if (completedMilestones.includes(index)) {
+                completedMilestones = completedMilestones.filter(m => m !== index);
+            } else {
+                completedMilestones.push(index);
+            }
+            localStorage.setItem('completedMilestones', JSON.stringify(completedMilestones));
+            renderMilestones();
+        }
+
+        function renderMilestones() {
+            const container = document.getElementById('milestonesContainer');
+            container.innerHTML = '';
+
+            curriculum.milestones.forEach((milestone, index) => {
+                const isCompleted = completedMilestones.includes(index);
+                const milestoneDiv = document.createElement('div');
+                milestoneDiv.className = `milestone ${isCompleted ? 'completed' : ''}`;
+                
+                milestoneDiv.innerHTML = `
+                    <input type="checkbox" class="milestone-checkbox" 
+                           ${isCompleted ? 'checked' : ''} 
+                           onchange="toggleMilestone(${index})">
+                    <div class="milestone-text">${milestone}</div>
+                `;
+                
+                container.appendChild(milestoneDiv);
+            });
+        }
+
+        // Initialize the page
+        renderWeeks();
+        renderMilestones();
+        updateProgress();
+    </script>
+</body>
+</html>
